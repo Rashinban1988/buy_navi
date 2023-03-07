@@ -16,6 +16,7 @@ class LocalNotification {
 
   late FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
 
+  // ローカル通知初期化
   Future initLocalNotification() async {
     _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     flutterLocalNotificationsPluginInitialize();
@@ -89,7 +90,7 @@ class LocalNotification {
         NotificationDetails(iOS: DarwinNotificationDetails());
     // 即時通知
     await notifications.show(
-        0, '買い物忘れはないですか？', '近くにお店があります。', platformChannelSpecifics, payload: '/shoplist',);
+        0, '買い物忘れはないですか？', '初回起動時テスト', platformChannelSpecifics, payload: '/shoplist',);
   }
 
   // 通知を送信する関数
@@ -126,7 +127,7 @@ class LocalNotification {
         NotificationDetails(iOS: DarwinNotificationDetails());
     // 即時通知
     await notifications.show(
-        0, '買い物忘れはないですか？', '前橋駅から１キロ以内に入っています', platformChannelSpecifics);
+        0, '買い物忘れはないですか？', '登録店舗から1km以内に入っています', platformChannelSpecifics);
   }
 }
 

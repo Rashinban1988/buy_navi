@@ -21,7 +21,7 @@ void main() async {
   await localNotification.showNotificationTest(); // 起動時の通知テスト用
 
   // google places API
-  googlePlacesService.searchPlaces(); // キーワードから経度と緯度を取得
+  // googlePlacesService.searchPlaces('セキチュー'); // キーワードから経度と緯度を取得
   googlePlacesService.myPositionListening(); // 現在地監視前橋駅より1キロ以内でプッシュ通知
 
   // 縦向き固定
