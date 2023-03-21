@@ -168,15 +168,13 @@ class _NowLocationState extends State<NowLocation> {
                   Text('経度： ${_serchPlaces[1]['longitude']}'),
                 },
                 const SizedBox(width: double.infinity, height: 50),
-                const Text('現在地からの距離'),
-                Text('${(_distance / 1000).toStringAsFixed(2)}km'),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: SizedBox(
-                      width: double.infinity,
-                      height: termSize(350),
-                      child: const MapSample()),
-                ),
+                // const Text('現在地からの距離'),
+                // Text('${(_distance / 1000).toStringAsFixed(2)}km'),
+                const Expanded(child: SizedBox()),
+                SizedBox(
+                    width: double.infinity,
+                    height: termSize(400),
+                    child: const MapSample()),
               ],
             ),
           ),
