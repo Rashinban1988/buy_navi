@@ -124,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
         return Scaffold(
           body: PageView(
-            // physics: const NeverScrollableScrollPhysics(), // 横スクロール移動無効
+            physics: const NeverScrollableScrollPhysics(), // 横スクロール移動無効
             controller: pager,
             children: const <Widget>[
               ShopIndex(),
