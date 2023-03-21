@@ -31,9 +31,18 @@ class GooglePlacesService {
     if (response.statusCode == 200) {
       var places = jsonDecode(response.body)['results']; // 検索したキーワードに該当の店舗を格納
       if (places.isNotEmpty) {
+        var fivePlaces = [];
+        int i = 0;
         var firstPlace = places.first; // 検索結果１件目取得
+        for (var place in places) {
+          fivePlaces.add(place);
+          if (i == 5) {
+            break;
+          }
+          i++;
+        }
         var placeId = firstPlace['place_id']; // ID取得
-        var searchLocation = {};
+        var searchLocation = [];
         searchLocation = await getPlaceDetails(placeId); // IDから経度・緯度の取得
         return searchLocation;
       }
@@ -50,15 +59,13 @@ class GooglePlacesService {
     if (response.statusCode == 200) {
       var location =
           jsonDecode(response.body)['result']['geometry']['location'];
-      var latitude = location['lat'];
-      var longitude = location['lng'];
       // latitude = 36.35911313;
       // longitude = 139.1208775;
-      var searchLocation = {};
-      searchLocation
-          .addAll({'latitude': location['lat'], 'longitude': longitude['lng']});
-
-      debugPrint('$latitude $longitude');
+      List<Map<dynamic, dynamic>> searchLocation = [];
+      searchLocation.addAll([
+        {'latitude': location['lat']},
+        {'longitude': location['lng']}
+      ]);
       return searchLocation;
     } else {
       debugPrint('Failed to get place details: ${response.statusCode}');
@@ -79,6 +86,7 @@ class GooglePlacesService {
     // 位置情報監視スタート
     StreamSubscription<Position> positionStream =
         Geolocator.getPositionStream().listen((position) {
+      // 以下位置情報が更新された際に実行する関数を記載
       // 起動時現在地がお店の位置より1キロ以内でプッシュ通知
       if (isWithin1Kilometer(
           position.latitude, position.longitude, shopLatitude, shopLongitude)) {
@@ -96,6 +104,15 @@ class GooglePlacesService {
     debugPrint('現在地：$latitude(緯度), $longitude(経度)');
     debugPrint('検索地との距離： $distanceInMeters');
     return distanceInMeters < 1000;
+  }
+
+  // 1キロ以内か判定するメソッド
+  dynamic isWithin1Kilometers(double shopLatitude, double shopLongitude) async {
+    var position = await Geolocator.getCurrentPosition();
+    // 現在地と検索地との距離を計算
+    var distanceInMeters = Geolocator.distanceBetween(
+        position.latitude, position.longitude, shopLatitude, shopLongitude);
+    return distanceInMeters;
   }
 }
 

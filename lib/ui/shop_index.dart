@@ -1,7 +1,10 @@
 import 'dart:async';
 
+import 'package:buy_navi/service/google_places_service.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+
+import 'google_map.dart';
 
 class ShopIndex extends StatefulWidget {
   const ShopIndex({super.key});
@@ -58,7 +61,6 @@ class _ShopIndexState extends State<ShopIndex> {
           children: [
             // Text(_currentPosition?.toString() ?? 'Loading...'),
             Container(
-              padding: EdgeInsets.all(inTermSize * 10),
               width: constraints.maxWidth,
               height: constraints.maxHeight,
               color: Colors.white,
@@ -79,11 +81,14 @@ class NowLocation extends StatefulWidget {
 }
 
 class _NowLocationState extends State<NowLocation> {
-  String _latitude = "NoData";         // 緯度
-  String _longitude = "NoData";        // 経度
-  String _altitude = "NoData";         // 高度
+  String _latitude = "NoData"; // 緯度
+  String _longitude = "NoData"; // 経度
+  String _altitude = "NoData"; // 高度
   String _distanceInMeters = "NoData"; // 距離
-  String _bearing = "NoData";          // 方位
+  String _bearing = "NoData"; // 方位
+  String _searchQuery = '';
+  double _distance = 0;
+  List<dynamic> _serchPlaces = [];
 
   Future<void> getLocation() async {
     // 端末へのアクセス権限を取得
@@ -113,19 +118,84 @@ class _NowLocationState extends State<NowLocation> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(_latitude, style: Theme.of(context).textTheme.headlineMedium),
-        Text(_longitude, style: Theme.of(context).textTheme.headlineMedium),
-        Text(_altitude, style: Theme.of(context).textTheme.headlineMedium),
-        Text(_distanceInMeters,
-            style: Theme.of(context).textTheme.headlineMedium),
-        Text(_bearing, style: Theme.of(context).textTheme.headlineMedium),
-        FloatingActionButton(
-            onPressed: getLocation, child: const Icon(Icons.location_on)),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final inTermSize = constraints.maxWidth / 100 / 4;
+        // 端末依存サイズ
+        double termSize(double num) {
+          final conversionSize = num * 0.0025;
+          final terminalMatch = constraints.maxWidth * conversionSize;
+          return terminalMatch;
+        }
+        return Scaffold(
+          appBar: AppBar(
+            elevation: termSize(0),
+            foregroundColor: Colors.black,
+            backgroundColor: Colors.white,
+            title: const Text('店舗を検索'),
+          ),
+          body: SizedBox(
+            width: double.infinity,
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: termSize(15),horizontal: termSize(15)),
+                  child: TextField(
+                    decoration: const InputDecoration(
+                        border: InputBorder.none, hintText: '検索したい店舗名を入力'),
+                    onChanged: (text) {
+                      _searchQuery = text;
+                    },
+                  ),
+                ),
+                ElevatedButton(
+                  child: const Text('検索'),
+                  onPressed: () async {
+                    _serchPlaces =
+                        await googlePlacesService.searchPlaces(_searchQuery);
+                    _distance = await googlePlacesService.isWithin1Kilometers(
+                        _serchPlaces[0]['latitude'], _serchPlaces[1]['longitude']);
+                    setState(() {
+                      _serchPlaces;
+                      _distance;
+                    });
+                  },
+                ),
+                const SizedBox(width: double.infinity, height: 50),
+                const Text('検索結果'),
+                if (_serchPlaces.isNotEmpty) ...{
+                  Text('緯度： ${_serchPlaces[0]['latitude']}'),
+                  Text('経度： ${_serchPlaces[1]['longitude']}'),
+                },
+                const SizedBox(width: double.infinity, height: 50),
+                const Text('現在地からの距離'),
+                Text('${(_distance / 1000).toStringAsFixed(2)}km'),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: SizedBox(
+                      width: double.infinity,
+                      height: termSize(350),
+                      child: const MapSample()),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
     );
+    // return Column(
+    //   crossAxisAlignment: CrossAxisAlignment.center,
+    //   mainAxisAlignment: MainAxisAlignment.center,
+    //   children: [
+    //     Text(_latitude, style: Theme.of(context).textTheme.headlineMedium),
+    //     Text(_longitude, style: Theme.of(context).textTheme.headlineMedium),
+    //     Text(_altitude, style: Theme.of(context).textTheme.headlineMedium),
+    //     Text(_distanceInMeters,
+    //         style: Theme.of(context).textTheme.headlineMedium),
+    //     Text(_bearing, style: Theme.of(context).textTheme.headlineMedium),
+    //     FloatingActionButton(
+    //         onPressed: getLocation, child: const Icon(Icons.location_on)),
+    //   ],
+    // );
   }
 }

@@ -98,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final PageController pager = PageController(); // pageViewのコントローラー
-    var state = Get.put(Controller()); // pageViewのタブ管理
+    var bottomTabNo = Get.put(Controller()); // pageViewのタブ管理
     return GetMaterialApp(
       // ルート管理
       initialRoute: '/',
@@ -111,8 +111,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       debugShowCheckedModeBanner: false,
       title: 'buy memo',
       theme: ThemeData(
-        scaffoldBackgroundColor: Colors.grey[50],
-        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Colors.white,
       ),
       home: LayoutBuilder(builder: (context, constraints) {
         final inTermSize = constraints.maxWidth / 100 / 4;
@@ -133,24 +132,27 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               CouponIndex(),
             ],
             onPageChanged: (int i) {
-              state.selected.value = i;
+              bottomTabNo.selected.value = i;
             },
           ),
           bottomNavigationBar: Obx(() => ConvexAppBar(
                 style: TabStyle.textIn,
+                curveSize: inTermSize * 80, // 丸み
+                top: inTermSize * -40, // 丸の高さ
+                height: inTermSize * 40, // 横線の高さ
+                // cornerRadius: inTermSize * 5, // 角の丸み
                 items: const [
                   TabItem(title: '現在地', icon: Icons.home),
                   TabItem(title: 'メモ', icon: Icons.note_alt_rounded),
                   TabItem(title: '設定', icon: Icons.settings),
                 ],
-                initialActiveIndex: state.selected.value,
+                initialActiveIndex: bottomTabNo.selected.value,
                 backgroundColor: ColorConstant.bottomBarThemeColor,
                 onTap: (int i) {
-                  state.selected.value = i;
+                  bottomTabNo.selected.value = i;
                   pager.jumpToPage(i);
                 },
-                // curve: Curves.easeOutSine,
-                height: inTermSize * 60,
+                curve: Curves.easeOutSine,
               )),
         );
       }),
