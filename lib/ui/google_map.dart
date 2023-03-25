@@ -6,7 +6,8 @@ import '../model/shop.dart';
 import 'loading_display.dart';
 
 class MapSample extends StatefulWidget {
-  const MapSample({Key? key}) : super(key: key);
+  final dynamic serchPlaces;
+  const MapSample({Key? key, required this.serchPlaces}) : super(key: key);
 
   @override
   State<MapSample> createState() => _MapSampleState();
@@ -20,15 +21,23 @@ class _MapSampleState extends State<MapSample> {
   late CameraPosition _kGooglePlex; // GoogleMaps起動時初期位置
   BitmapDescriptor? _markerIcon;
   final Set<Marker> _markers = {};
+  var shops = [];
 
   final _pageController = PageController(
-    viewportFraction: 1,//0.85くらいで端っこに別のカードが見えてる感じになる
+    viewportFraction: 1, //0.85くらいで端っこに別のカードが見えてる感じになる
   );
+  Future<void> initPlaces(places) async {
+    for (var place in places) {
+      Shop shop = Shop(
+        place['place_id'],
+        place['geometry']['location']['lat'],
+        place['geometry']['location']['lng'],
+        place['name'],
+      );
+      shops.add(shop);
+    }
+  }
 
-  final shops = [
-    Shop('1', 36.3446996, 139.1242414, 'セキチュー駒形店'),
-    Shop('2', 36.3416856, 139.1978572, '華蔵寺遊園地'),
-  ];
 
   // state初期化
   @override
@@ -46,6 +55,7 @@ class _MapSampleState extends State<MapSample> {
   }
 
   Future<bool> getCurrentPosition() async {
+    initPlaces(widget.serchPlaces);
     position = await Geolocator.getCurrentPosition();
     currentLatitude = position.latitude;
     currentLongitude = position.longitude;
@@ -114,8 +124,8 @@ class _MapSampleState extends State<MapSample> {
 
   Widget _cardSection() {
     return Container(
-      width: 200,
-      height: 120,
+      width: 300,
+      height: 150,
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
       child: PageView(
         onPageChanged: (int index) async {
@@ -165,9 +175,7 @@ class _MapSampleState extends State<MapSample> {
                       Text(shop.name),
                     ],
                   ),
-                  const ElevatedButton(
-                    onPressed: null,
-                    child: Text('このお店を登録'))
+                  const ElevatedButton(onPressed: null, child: Text('このお店を登録'))
                 ],
               ),
             ),

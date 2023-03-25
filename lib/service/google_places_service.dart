@@ -34,16 +34,15 @@ class GooglePlacesService {
         var fivePlaces = [];
         int i = 0;
         var firstPlace = places.first; // 検索結果１件目取得
+        var searchLocation = [];
         for (var place in places) {
           fivePlaces.add(place);
+          searchLocation.add(place); // IDから経度・緯度の取得
           if (i == 5) {
             break;
           }
           i++;
         }
-        var placeId = firstPlace['place_id']; // ID取得
-        var searchLocation = [];
-        searchLocation = await getPlaceDetails(placeId); // IDから経度・緯度の取得
         return searchLocation;
       }
     } else {

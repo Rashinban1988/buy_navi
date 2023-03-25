@@ -6,6 +6,7 @@ class CouponIndex extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MapSample();
+    final _serchPlaces = [];
+    return MapSample(serchPlaces: _serchPlaces);
   }
 }
